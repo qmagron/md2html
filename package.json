@@ -1,0 +1,10 @@
+{
+  "name": "md2html",
+  "description": "A simple and flexible markdown to html transpiler",
+  "version": "0.1",
+  "author": "Quentin Magron",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.8.3"
+  }
+}
