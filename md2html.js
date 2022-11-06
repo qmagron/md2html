@@ -2,6 +2,13 @@ const path = require('path');
 const fs = require('fs/promises');
 
 
+const PATTERNS = [
+  /* Cleaning */
+  { pattern: /\r\n/g, replace: "\n" },
+  { pattern: /\n{3,}/g, replace: "\n\n" },
+];
+
+
 /**
  * Perform a Markdown -> HTML transpilation.
  *
@@ -9,9 +16,11 @@ const fs = require('fs/promises');
  * @return  {String}  Generated HTML
  */
  function transpile(markdown) {
-  let html = markdown.toString();
+  let html = markdown.toString() + "\n";
 
-  // TODO
+  for (let { pattern, replace } of PATTERNS) {
+    html = html.replaceAll(pattern, replace);
+  }
 
   return html;
 }
