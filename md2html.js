@@ -18,8 +18,12 @@ const PATTERNS = [
   { pattern: /^#{6} (.+)$/mg, replace: "<h6>$1</h6>" },
 
   /* TODO: Paragraphs */
-  { pattern: /  \n/g, replace: "<br>" },
-  { pattern: /(?<!\n)\n(?![\s-+*])/g, replace: " " },
+  { pattern: /  \n>*/g, replace: "<br>" },
+  { pattern: /(?<!\n)\n(?![\s-+*>])/g, replace: " " },
+
+  /* Blockquotes */
+  { pattern: /^> (.+?)\n\n/msg,
+    replace: (_, p1) => `<blockquote>\n${transpileQuote(p1)}</blockquote>\n\n` },
 
   /* Emphasis */
   { pattern: /(?<!\\)\*{2}([^\s*](?:.*?[^\s\\])?)\*{2}/g, replace: "<strong>$1</strong>" },
@@ -30,19 +34,31 @@ const PATTERNS = [
 
 
 /**
+ * Perform a Markdown -> HTML transpilation in a quote.
+ *
+ * @param   {String}  quote  Markdown quote to transpile
+ * @return  {String}  Generated HTML
+ */
+ function transpileQuote(quote) {
+  quote = quote.replaceAll(/^> ?/mg, "");
+  return transpile(quote);
+}
+
+
+/**
  * Perform a Markdown -> HTML transpilation.
  *
  * @param   {String}  markdown  Markdown text to transpile
  * @return  {String}  Generated HTML
  */
  function transpile(markdown) {
-  let html = markdown.toString() + "\n";
+  let html = markdown.toString().trimEnd() + "\n\n";
 
   for (let { pattern, replace } of PATTERNS) {
     html = html.replaceAll(pattern, replace);
   }
 
-  return html;
+  return html.trimEnd() + "\n";
 }
 
 
