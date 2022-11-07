@@ -16,6 +16,10 @@ const PATTERNS = [
   { pattern: /^#{4} (.+)$/mg, replace: "<h4>$1</h4>" },
   { pattern: /^#{5} (.+)$/mg, replace: "<h5>$1</h5>" },
   { pattern: /^#{6} (.+)$/mg, replace: "<h6>$1</h6>" },
+
+  /* TODO: Paragraphs */
+  { pattern: /  \n/g, replace: "<br>" },
+  { pattern: /(?<!\n)\n(?![\s-+*])/g, replace: " " },
 ];
 
 
