@@ -6,6 +6,16 @@ const PATTERNS = [
   /* Cleaning */
   { pattern: /\r\n/g, replace: "\n" },
   { pattern: /\n{3,}/g, replace: "\n\n" },
+
+  /* Headings */
+  { pattern: /^(.+)\n=+$/mg, replace: "<h1>$1</h1>" },
+  { pattern: /^(.+)\n-+$/mg, replace: "<h2>$1</h2>" },
+  { pattern: /^#{1} (.+)$/mg, replace: "<h1>$1</h1>" },
+  { pattern: /^#{2} (.+)$/mg, replace: "<h2>$1</h2>" },
+  { pattern: /^#{3} (.+)$/mg, replace: "<h3>$1</h3>" },
+  { pattern: /^#{4} (.+)$/mg, replace: "<h4>$1</h4>" },
+  { pattern: /^#{5} (.+)$/mg, replace: "<h5>$1</h5>" },
+  { pattern: /^#{6} (.+)$/mg, replace: "<h6>$1</h6>" },
 ];
 
 
