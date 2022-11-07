@@ -17,10 +17,6 @@ const PATTERNS = [
   { pattern: /^#{5} (.+)$/mg, replace: "<h5>$1</h5>" },
   { pattern: /^#{6} (.+)$/mg, replace: "<h6>$1</h6>" },
 
-  /* TODO: Paragraphs */
-  { pattern: /  \n>* ?(?! )/g, replace: "<br>" },
-  { pattern: /(?<!\n)\n(?![\s-+*<>]|(?:\d+\.))/g, replace: " " },
-
   /* Lists */
   { pattern: /^([-+*] .+?)\n\n(?![\s-+*])/msg,
     replace: (_, p1) => `<ul>\n${transpileList(p1)}</ul>\n\n` },
@@ -30,6 +26,10 @@ const PATTERNS = [
   /* Blockquotes */
   { pattern: /^> (.+?)\n\n/msg,
     replace: (_, p1) => `<blockquote>\n${transpileQuote(p1)}</blockquote>\n\n` },
+
+  /* TODO: Paragraphs */
+  { pattern: /(?<!^)  \n>*/mg, replace: "<br>" },
+  { pattern: /(?<![\n>])\n(?![\s-+*<>]|(?:\d+\.))/g, replace: " " },
 
   /* Emphasis */
   { pattern: /(?<!\\)\*{2}([^\s*](?:.*?[^\s\\])?)\*{2}/g, replace: "<strong>$1</strong>" },
