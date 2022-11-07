@@ -18,8 +18,12 @@ const PATTERNS = [
   { pattern: /^#{6} (.+)$/mg, replace: "<h6>$1</h6>" },
 
   /* TODO: Paragraphs */
-  { pattern: /  \n>*/g, replace: "<br>" },
-  { pattern: /(?<!\n)\n(?![\s-+*>])/g, replace: " " },
+  { pattern: /  \n>* */g, replace: "<br>" },
+  { pattern: /(?<!\n)\n(?![\s-+*<>])/g, replace: " " },
+
+  /* Lists */
+  { pattern: /^([-+*] .+?)\n\n(?![\s-+*])/msg,
+    replace: (_, p1) => `<ul>\n${transpileList(p1)}</ul>\n\n` },
 
   /* Blockquotes */
   { pattern: /^> (.+?)\n\n/msg,
@@ -31,6 +35,64 @@ const PATTERNS = [
   { pattern: /(?<!\\)\*([^\s*](?:.*?[^\s\\])?)\*/g, replace: "<em>$1</em>" },
   { pattern: /(?<!\\)_([^\s_](?:.*?[^\s\\])?)_/g, replace: "<em>$1</em>" },
 ];
+
+
+/**
+ * Perform a Markdown -> HTML transpilation in a list item matched by a regex.
+ *
+ * @param   {String}  _ The whole matched string
+ * @param   {String}  p1 Text content
+ * @param   {String}  p2 Children items
+ * @return  {String}  Generated HTML
+ */
+const sublistReplacer = (_, p1, p2) => {
+  p2 = p2.replaceAll(/^  /mg, "");
+  p2 = p2.replaceAll(/^  (?![\s-+*])/mg, "");
+  const text = transpile(p1).trim();
+  const children = transpile(p2).trim();
+  return `<li>${text}\n${children}\n</li>`;
+}
+
+const LIST_PATTERNS = [
+  /* Trim newlines in <li> */
+  { pattern: /(?<!\n)\n {0,2}(?![\s-+*>])/g, replace: " " },
+
+  /* Nested lists & block children */
+  { pattern: /(?<=^|\n)[-+*] ([^\n]+)\n(\s.+?)(?=(?:\n[-+*])|$)/sg, replace: sublistReplacer },
+
+  /* Direct <li> items */
+  { pattern: /^[-+*] (.+)$/mg, replace: (_, p1) => `<li>${transpile(p1).trim()}</li>` },
+];
+
+
+/**
+ * Perform a transpilation from a list of patterns.
+ * Patterns are applied in order.
+ *
+ * @param   {String}  text  Input text to transpile
+ * @param   {Array}   patterns  List of { pattern, replace } objects to apply
+ * @return  {String}  Transpiled text
+ */
+ function _transpile(text, patterns) {
+  text = text.trim() + "\n\n";
+
+  for (const { pattern, replace } of patterns) {
+    text = text.replace(pattern, replace);
+  }
+
+  return text.trim() + "\n";
+}
+
+
+/**
+ * Perform a Markdown -> HTML transpilation in a list.
+ *
+ * @param   {String}  list  Markdown list to transpile
+ * @return  {String}  Generated HTML
+ */
+ function transpileList(list) {
+  return _transpile(list, LIST_PATTERNS);
+}
 
 
 /**
@@ -52,13 +114,7 @@ const PATTERNS = [
  * @return  {String}  Generated HTML
  */
  function transpile(markdown) {
-  let html = markdown.toString().trimEnd() + "\n\n";
-
-  for (let { pattern, replace } of PATTERNS) {
-    html = html.replaceAll(pattern, replace);
-  }
-
-  return html.trimEnd() + "\n";
+  return _transpile(markdown.toString(), PATTERNS);
 }
 
 
