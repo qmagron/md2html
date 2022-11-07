@@ -18,12 +18,14 @@ const PATTERNS = [
   { pattern: /^#{6} (.+)$/mg, replace: "<h6>$1</h6>" },
 
   /* TODO: Paragraphs */
-  { pattern: /  \n>* */g, replace: "<br>" },
-  { pattern: /(?<!\n)\n(?![\s-+*<>])/g, replace: " " },
+  { pattern: /  \n>* ?(?! )/g, replace: "<br>" },
+  { pattern: /(?<!\n)\n(?![\s-+*<>]|(?:\d+\.))/g, replace: " " },
 
   /* Lists */
   { pattern: /^([-+*] .+?)\n\n(?![\s-+*])/msg,
     replace: (_, p1) => `<ul>\n${transpileList(p1)}</ul>\n\n` },
+  { pattern: /^(\d+\. .+?)\n\n(?!\s|(?:\d+\.))/msg,
+    replace: (_, p1) => `<ol>\n${transpileList(p1)}</ol>\n\n` },
 
   /* Blockquotes */
   { pattern: /^> (.+?)\n\n/msg,
@@ -47,7 +49,7 @@ const PATTERNS = [
  */
 const sublistReplacer = (_, p1, p2) => {
   p2 = p2.replaceAll(/^  /mg, "");
-  p2 = p2.replaceAll(/^  (?![\s-+*])/mg, "");
+  p2 = p2.replaceAll(/^  (?![\s-+*]|(?:\d+\.))/mg, "");
   const text = transpile(p1).trim();
   const children = transpile(p2).trim();
   return `<li>${text}\n${children}\n</li>`;
@@ -55,13 +57,15 @@ const sublistReplacer = (_, p1, p2) => {
 
 const LIST_PATTERNS = [
   /* Trim newlines in <li> */
-  { pattern: /(?<!\n)\n {0,2}(?![\s-+*>])/g, replace: " " },
+  { pattern: /(?<!\n)\n {0,2}(?![\s-+*>]|(?:\d+\.))/g, replace: " " },
 
   /* Nested lists & block children */
   { pattern: /(?<=^|\n)[-+*] ([^\n]+)\n(\s.+?)(?=(?:\n[-+*])|$)/sg, replace: sublistReplacer },
+  { pattern: /(?<=^|\n)\d+\. ([^\n]+)\n(\s.+?)(?=(?:\n\d+\.)|$)/sg, replace: sublistReplacer },
 
   /* Direct <li> items */
   { pattern: /^[-+*] (.+)$/mg, replace: (_, p1) => `<li>${transpile(p1).trim()}</li>` },
+  { pattern: /^\d+\. (.+)$/mg, replace: (_, p1) => `<li>${transpile(p1).trim()}</li>` },
 ];
 
 
