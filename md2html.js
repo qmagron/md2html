@@ -20,6 +20,12 @@ const PATTERNS = [
   /* TODO: Paragraphs */
   { pattern: /  \n/g, replace: "<br>" },
   { pattern: /(?<!\n)\n(?![\s-+*])/g, replace: " " },
+
+  /* Emphasis */
+  { pattern: /(?<!\\)\*{2}([^\s*](?:.*?[^\s\\])?)\*{2}/g, replace: "<strong>$1</strong>" },
+  { pattern: /(?<!\\)_{2}([^\s_](?:.*?[^\s\\])?)_{2}/g, replace: "<strong>$1</strong>" },
+  { pattern: /(?<!\\)\*([^\s*](?:.*?[^\s\\])?)\*/g, replace: "<em>$1</em>" },
+  { pattern: /(?<!\\)_([^\s_](?:.*?[^\s\\])?)_/g, replace: "<em>$1</em>" },
 ];
 
 
